@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ujian Uji Coba — Examora Demo</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:#f6f7f9; color:#1a1a1a; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 80px; }
+  header { background:#1a73e8; color:#fff; padding:16px; border-radius:12px; margin-bottom:16px; }
+  header h1 { margin:0 0 4px; font-size:18px; }
+  header p { margin:0; font-size:13px; opacity:.9; }
+  .card { background:#fff; border:1px solid #e0e3e8; border-radius:12px; padding:16px; margin-bottom:14px; }
+  .card h2 { margin:0 0 12px; font-size:15px; }
+  .q { margin: 0 0 18px; }
+  .q p { margin:0 0 8px; font-size:14px; font-weight:600; }
+  label { display:block; padding:9px 10px; border:1px solid #e0e3e8; border-radius:8px; margin-bottom:6px; font-size:14px; }
+  label:has(input:checked) { border-color:#1a73e8; background:#eaf1fe; }
+  input[type=text] { width:100%; padding:10px; border:1px solid #d5d9e0; border-radius:8px; font-size:14px; }
+  button { width:100%; padding:13px; border:0; border-radius:10px; background:#1a73e8; color:#fff; font-size:15px; font-weight:600; }
+  button:disabled { background:#9db8e8; }
+  #monitor { position:fixed; left:0; right:0; bottom:0; background:#111; color:#fff; font-size:12px;
+             padding:9px 14px; display:flex; justify-content:space-between; align-items:center; }
+  #monitor b { color:#ff6b6b; font-size:14px; }
+  #monitor.ok b { color:#5ddc7a; }
+  #done { display:none; text-align:center; padding:26px 16px; }
+  #done h2 { color:#188038; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Ujian Uji Coba — Examora (Demo)</h1>
+    <p>Halaman ini untuk menguji aplikasi Examora. Bukan ujian sungguhan.</p>
+  </header>
+
+  <div id="form">
+    <div class="card">
+      <h2>Identitas</h2>
+      <input type="text" id="nama" placeholder="Nama peserta" autocomplete="off">
+    </div>
+
+    <div class="card">
+      <h2>Soal (5)</h2>
+      <div class="q"><p>1. Ibu kota Indonesia adalah…</p>
+        <label><input type="radio" name="q1" value="a"> Jakarta</label>
+        <label><input type="radio" name="q1" value="b"> Bandung</label>
+        <label><input type="radio" name="q1" value="c"> Surabaya</label></div>
+      <div class="q"><p>2. 7 × 8 = …</p>
+        <label><input type="radio" name="q2" value="a"> 54</label>
+        <label><input type="radio" name="q2" value="b"> 56</label>
+        <label><input type="radio" name="q2" value="c"> 64</label></div>
+      <div class="q"><p>3. Simbol kimia air adalah…</p>
+        <label><input type="radio" name="q3" value="a"> CO2</label>
+        <label><input type="radio" name="q3" value="b"> H2O</label>
+        <label><input type="radio" name="q3" value="c"> O2</label></div>
+      <div class="q"><p>4. Pancasila sila pertama…</p>
+        <label><input type="radio" name="q4" value="a"> Ketuhanan Yang Maha Esa</label>
+        <label><input type="radio" name="q4" value="b"> Kemanusiaan yang adil dan beradab</label>
+        <label><input type="radio" name="q4" value="c"> Persatuan Indonesia</label></div>
+      <div class="q"><p>5. Bahasa pemrograman untuk web, kecuali…</p>
+        <label><input type="radio" name="q5" value="a"> JavaScript</label>
+        <label><input type="radio" name="q5" value="b"> PHP</label>
+        <label><input type="radio" name="q5" value="c"> Kotlin</label></div>
+    </div>
+
+    <button id="kirim">Kirim Jawaban</button>
+  </div>
+
+  <div id="done" class="card">
+    <h2>Jawaban terkirim</h2>
+    <p id="ringkas"></p>
+    <p style="font-size:12px;color:#666">Ini halaman demo — tidak ada data yang dikirim ke server mana pun.</p>
+  </div>
+</div>
+
+<div id="monitor">
+  <span>Pindah aplikasi terdeteksi:</span>
+  <b id="cnt">0</b>
+</div>
+
+<script>
+(function () {
+  var n = 0, el = document.getElementById('cnt'), mon = document.getElementById('monitor');
+  function bump(kind) {
+    n++;
+    el.textContent = n;
+    mon.classList.remove('ok');
+    try { console.log('DETECT:' + kind + ':' + document.visibilityState); } catch (e) {}
+  }
+  document.addEventListener('visibilitychange', function () { bump('visibilitychange'); });
+  window.addEventListener('blur', function () { bump('blur'); });
+  window.addEventListener('pagehide', function () { bump('pagehide'); });
+  setInterval(function () { if (document.hidden) bump('poll'); }, 1500);
+
+  document.getElementById('kirim').addEventListener('click', function () {
+    var nama = document.getElementById('nama').value.trim() || '(tanpa nama)';
+    var jawab = [];
+    for (var i = 1; i <= 5; i++) {
+      var c = document.querySelector('input[name="q' + i + '"]:checked');
+      jawab.push(c ? c.value : '-');
+    }
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('done').style.display = 'block';
+    document.getElementById('ringkas').textContent =
+      'Nama: ' + nama + ' · Jawaban: ' + jawab.join(', ') + ' · Deteksi pindah-app: ' + n;
+  });
+})();
+</script>
+</body>
+</html>
